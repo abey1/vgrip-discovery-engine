@@ -1,0 +1,34 @@
+services:
+  app:
+    build: .
+    container_name: vgrip-app
+
+    env_file:
+      - .env
+
+    volumes:
+      - .:/app
+
+    depends_on:
+      - postgres
+
+    command: npm run dev
+
+  postgres:
+    image: postgres:16
+
+    container_name: vgrip-postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: vgrip
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/postgres_data
+
+volumes:
+  postgres_data:

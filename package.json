@@ -1,4 +1,13 @@
 {
+  "name": "vgrip-discovery-engine",
+  "version": "1.0.0",
+  "description": "VIP Guest Relationship Intelligence Platform Discovery Engine",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js"
+  },
   "dependencies": {
     "axios": "^1.18.1",
     "cheerio": "^1.2.0",
