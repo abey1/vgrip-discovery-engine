@@ -1,6 +1,7 @@
 {
   "name": "vgrip-discovery-engine",
   "version": "1.0.0",
+  "type": "module",
   "description": "VIP Guest Relationship Intelligence Platform Discovery Engine",
   "private": true,
   "scripts": {
@@ -15,7 +16,8 @@
     "drizzle-orm": "^0.45.2",
     "node-cron": "^4.5.0",
     "pg": "^8.22.0",
-    "playwright": "^1.61.1"
+    "playwright": "^1.61.1",
+    "postgres": "^3.4.9"
   },
   "devDependencies": {
     "@types/node": "^26.1.0",
