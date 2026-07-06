@@ -8,7 +8,7 @@ export function runScheduledJob() {
  // Then daily
 //  */5 * * * *
 // 0 2 * * *
- cron.schedule("*/5 * * * *", async () => {
+ cron.schedule("0 2 * * *", async () => {
    console.log("[Scheduler] Running daily pipeline...");
    await runPipeline();
  });
