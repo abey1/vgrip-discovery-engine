@@ -6,6 +6,11 @@ services:
     env_file:
       - .env
 
+    environment:
+      # Inside the compose network, "localhost" would point at the app
+      # container itself, so override the host-oriented URL from .env.
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/vgrip
+
     volumes:
       - .:/app
       - /app/node_modules
@@ -26,7 +31,9 @@ services:
       POSTGRES_DB: vgrip
 
     ports:
-      - "5432:5432"
+      # Host port 5433 because a native Windows PostgreSQL service
+      # already occupies 5432 on this machine.
+      - "5433:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data

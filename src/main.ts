@@ -1,21 +1,35 @@
-import "dotenv/config";
+import { runScheduledJob } from "./scheduler/cron.js";
 
-import { db } from "./db/index.js";
-import { discoveredContacts } from "./db/schema.js";
+async function bootstrap() {
+ console.log("[VGRIP-DE] Starting service...");
 
-async function main() {
-  const result = await db
-    .insert(discoveredContacts)
-    .values({
-      name: "Abey",
-      email: "abey@test.com",
-      bio: "Testing Drizzle ORM",
-      domain: "test.com",
-      keyword: "test",
-    })
-    .returning();
+ await runScheduledJob();
 
-  console.log(result);
+ console.log("[VGRIP-DE] Initial run complete");
 }
 
-main().catch(console.error);
+bootstrap();
+
+// import "dotenv/config";
+
+// import { prisma } from "./db/index.js";
+
+// async function main() {
+//   const result = await prisma.discoveredContact.upsert({
+//     where: { email: "abey@test.com" },
+//     update: {},
+//     create: {
+//       name: "Abey",
+//       email: "abey@test.com",
+//       bio: "Testing Prisma 7",
+//       domain: "test.com",
+//       keyword: "test",
+//     },
+//   });
+
+//   console.log(result);
+// }
+
+// main()
+//   .catch(console.error)
+//   .finally(() => prisma.$disconnect());
