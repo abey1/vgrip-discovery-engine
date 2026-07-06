@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { runScheduledJob } from "./scheduler/cron.js";
 
 async function bootstrap() {

@@ -1,13 +1,25 @@
 import axios from "axios";
 
 export async function searchGoogle(query: string) {
- const res = await axios.get("https://www.googleapis.com/customsearch/v1", {
-   params: {
-     key: process.env.GOOGLE_API_KEY,
-     cx: process.env.GOOGLE_CX,
-     q: query,
-   },
- });
+  try {
+    const response = await axios.post(
+      "https://google.serper.dev/search",
+      { q: query },
+      {
+        headers: {
+          // Read at call time so it works regardless of when dotenv loads.
+          "X-API-KEY": process.env.SERPER_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
- return res.data.items || [];
+    return response.data.organic || [];
+  } catch (error) {
+    const detail = axios.isAxiosError(error)
+      ? error.response?.data ?? error.message
+      : error;
+    console.error(`[Search] Failed for "${query}":`, detail);
+    return [];
+  }
 }
