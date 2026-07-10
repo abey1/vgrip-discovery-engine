@@ -4,7 +4,7 @@ services:
     container_name: vgrip-app
 
     env_file:
-      - .env
+      - stack.env
 
     environment:
       # Inside the compose network, "localhost" would point at the app
