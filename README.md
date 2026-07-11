@@ -1,3 +1,254 @@
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------production--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# VGRIP Discovery Engine
+
+## Deployment & Production Configuration
+
+The project was initially developed locally using Docker Compose and later adapted for deployment on a remote Docker host using Portainer.io. The deployment process involved several iterations to make the application production-ready.
+
+---
+
+## 1. Switched from Development to Production
+
+The application was originally designed for local development using:
+
+- `docker compose`
+- bind mounts (`.:/app`)
+- `npm run dev`
+- local `.env` files
+
+For production these changes were made:
+
+- removed development bind mounts
+- changed application startup from `npm run dev` to `npm start`
+- built the TypeScript application during Docker image creation
+- pushed the application image to Docker Hub
+
+---
+
+## 2. Docker Image
+
+The application is packaged as a Docker image.
+
+Example:
+
+```bash
+docker build -t bruckabey/vgrip:latest .
+docker push bruckabey/vgrip:latest
+```
+
+The production deployment references the published image instead of rebuilding it.
+
+---
+
+## 3. Production Docker Compose
+
+A dedicated deployment compose file was created for Portainer deployment.
+
+Instead of:
+
+```yaml
+build: .
+```
+
+the deployment uses
+
+```yaml
+image: bruckabey/vgrip:latest
+```
+
+This allows Portainer to simply pull the latest image from Docker Hub.
+
+---
+
+## 4. PostgreSQL
+
+A PostgreSQL container is deployed alongside the application.
+
+Database configuration:
+
+- PostgreSQL 16
+- persistent Docker volume
+- database name: `vgrip`
+
+The application communicates with PostgreSQL through the internal Docker network.
+
+```
+postgresql://postgres:postgres@postgres:5432/vgrip
+```
+
+---
+
+## 5. Database Startup Problem
+
+One issue discovered during deployment was that the application sometimes started before PostgreSQL had finished initializing.
+
+This caused Prisma to throw:
+
+```
+P1001
+Can't reach database server
+```
+
+Initially a PostgreSQL health check using `pg_isready` was added.
+
+Later the application startup process was improved by introducing an entrypoint script that repeatedly attempts to execute Prisma migrations until the database becomes available.
+
+This made the application startup much more reliable.
+
+---
+
+## 6. Automatic Prisma Migration
+
+An `entrypoint.sh` script was introduced.
+
+Responsibilities:
+
+- wait for PostgreSQL
+- execute
+
+```bash
+npx prisma migrate deploy
+```
+
+until successful
+
+- start the application
+
+```bash
+npm start
+```
+
+This guarantees that required database tables exist before the scheduler starts.
+
+---
+
+## 7. Dockerfile Improvements
+
+Several production improvements were made:
+
+- switched from development startup to production startup
+- compiled the TypeScript source code into JavaScript (`dist/`) during the Docker image build
+- configured the production container to execute `node dist/main.js`
+- changed startup from `CMD` to `ENTRYPOINT`
+- replaced `/bin/bash` with `/bin/sh` because `node:20-slim` does not include Bash
+
+---
+
+## 8. Environment Variables
+
+Local development originally relied on `.env`.
+
+During deployment this was changed to Portainer Stack Environment Variables.
+
+The deployment compose file references environment variables using Docker Compose substitution.
+
+Example:
+
+```yaml
+environment:
+  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/vgrip
+  SERPER_API_KEY: ${SERPER_API_KEY}
+```
+
+Secrets are **not** stored inside the Docker image.
+
+This allows API keys to be changed without rebuilding or republishing the image.
+
+---
+
+## 9. Docker Hub Deployment
+
+The application image is published to Docker Hub.
+
+Deployment process:
+
+1. Build image
+
+```bash
+docker build -t bruckabey/vgrip:latest .
+```
+
+2. Push image
+
+```bash
+docker push bruckabey/vgrip:latest
+```
+
+3. Deploy from Portainer
+
+Portainer pulls the latest image directly from Docker Hub.
+
+---
+
+## 10. Portainer Deployment
+
+The production deployment consists of two containers:
+
+- vgrip-app
+- PostgreSQL 16
+
+Deployment steps:
+
+1. Create a Stack
+2. Paste the production `docker-compose.yml`
+3. Configure required environment variables in Portainer
+4. Deploy the stack
+
+The application automatically:
+
+- waits for PostgreSQL
+- applies Prisma migrations
+- starts the scheduler
+- executes the discovery pipeline
+
+---
+
+## 11. Search Engine Migration
+
+Google Programmable Search Engine was replaced with **Serper.dev** due to Google's announced deprecation of Programmable Search Engine support for new users.
+
+Changes included:
+
+- replacing the search implementation
+- adding `SERPER_API_KEY`
+- loading the API key through environment variables
+- updating deployment configuration
+
+---
+
+## 12. ORM Migration
+
+The project originally used Drizzle ORM.
+
+After encountering schema synchronization issues during containerized deployment, the persistence layer was migrated to Prisma.
+
+Benefits:
+
+- simpler migrations
+- better deployment workflow
+- automatic migration support using `prisma migrate deploy`
+
+---
+
+## 13. Development Foundation
+
+Earlier milestones included:
+
+- Playwright crawler
+- Cheerio HTML parsing
+- scheduled discovery using node-cron
+- PostgreSQL persistence
+- Docker Compose development environment
+- TypeScript project structure
+- modular extraction pipeline
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------production--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 Software Developer — Role Brief
 Software Developer — Role Brief
 Full Stack / Front-End / Back-End Developer (FSD / FED / BED)
