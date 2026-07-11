@@ -1,7 +1,7 @@
 services:
   app:
     image: bruckabey/vgrip:latest
-    build: .
+    # build: .
     container_name: vgrip-app
 
     env_file:
