@@ -12,6 +12,8 @@ RUN npm run build
 
 RUN npx playwright install chromium --with-deps
 
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # CMD ["npm", "run", "dev"]
-CMD ["npm", "start"]
+CMD ["/app/entrypoint.sh"]
