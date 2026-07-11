@@ -12,15 +12,17 @@ services:
       # container itself, so override the host-oriented URL from .env.
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/vgrip
 
-    volumes:
-      - .:/app
-      - /app/node_modules
+    # only for dev
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
 
     depends_on:
       postgres:
         condition: service_healthy
 
-    command: npm run start
+    # has been replaced by entrypoint.sh in dockerfile
+    # command: npm run start
 
   postgres:
     image: postgres:16
