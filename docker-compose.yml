@@ -1,5 +1,6 @@
 services:
   app:
+    image: bruckabey/vgrip:latest
     build: .
     container_name: vgrip-app
 
@@ -16,12 +17,19 @@ services:
       - /app/node_modules
 
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
-    command: npm run dev
+    command: npm run start
 
   postgres:
     image: postgres:16
+
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
     container_name: vgrip-postgres
 
@@ -33,7 +41,7 @@ services:
     ports:
       # Host port 5433 because a native Windows PostgreSQL service
       # already occupies 5432 on this machine.
-      - "5433:5432"
+      - "5432:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data

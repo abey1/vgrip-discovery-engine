@@ -10,7 +10,10 @@ async function bootstrap() {
  console.log("[VGRIP-DE] Initial run complete");
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 
 // import "dotenv/config";
 

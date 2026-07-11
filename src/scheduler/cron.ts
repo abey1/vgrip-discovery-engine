@@ -1,9 +1,11 @@
 import cron from "node-cron";
 import { runPipeline } from "../pipeline/runPipeline.js";
+import waitForDatabase from "../db/waitForDatabase.js";
 
-export function runScheduledJob() {
+export async function runScheduledJob() {
  // Run immediately on startup
- runPipeline();
+ await waitForDatabase();
+ await runPipeline();
 
  // Then daily
 //  */5 * * * *
